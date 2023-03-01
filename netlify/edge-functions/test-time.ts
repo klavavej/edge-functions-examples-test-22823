@@ -1,13 +1,4 @@
-import { Config } from "https://edge.netlify.com";
-
-export default () => {
-  const body = new Date().toUTCString();
-  const headers = {
-    "cache-control": "public, s-maxage=60",
-  };
-
-  return new Response(body, { headers });
-};
+export default () => new Response("Hello world")
 
 export const config: Config = () => ({
   cache: "manual",
