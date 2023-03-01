@@ -1,4 +1,5 @@
 export default () => {
+	console.log("Hello from a test");
 	const body = new Date().toUTCString()
 	const headers = {
 		"cache-control": "public, s-maxage=60"
@@ -7,4 +8,4 @@ export default () => {
 	return new Response(body, { headers })
 }
 
-export const config = { path: "/test" }
+export const config = { cache: "manual", path: "/test" }
