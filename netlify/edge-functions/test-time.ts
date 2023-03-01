@@ -1,15 +1,15 @@
-import { Config, Context } from "https://edge.netlify.com"
+import { Config } from "https://edge.netlify.com";
 
-export default async (req: Request, context: Context) => {
-	const res = await context.next()
-	const text = await res.text()
-	const body = `${new Date().toUTCString()} / ${text}`
+export default () => {
+  const body = new Date().toUTCString();
+  const headers = {
+    "cache-control": "public, s-maxage=60",
+  };
 
-	return new Response(body)
-}
+  return new Response(body, { headers });
+};
 
-// We could set "cache" to "off", but that's the default
-// setting so we can omit it.
 export const config: Config = () => ({
-	path: "/current-time"
-})
+  cache: "manual",
+  path: "/current-time",
+});
