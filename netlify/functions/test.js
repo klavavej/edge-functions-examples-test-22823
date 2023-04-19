@@ -1,35 +1,28 @@
-import { stream } from "@netlify/functions";
-import { ReadableStream } from "node:stream/web";
+module.exports.handler = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    const httpResponseMetadata = {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "text/html",
+        "X-Custom-Header": "Example-Custom-Header",
+      },
+    };
 
-export const handler = stream(async (event, context) => {
-  const body = new ReadableStream({
-    start(controller) {
-      setTimeout(() => {
-        controller.enqueue(new TextEncoder().encode("Tears stream\n"));
-      }, 1000);
-      setTimeout(() => {
-        controller.enqueue(new TextEncoder().encode("down your face\n"));
-      }, 2000);
-      setTimeout(() => {
-        controller.enqueue(new TextEncoder().encode("i promise you\n"));
-      }, 3000);
-      setTimeout(() => {
-        controller.enqueue(
-          new TextEncoder().encode("I will learn from my mistakes\n")
-        );
-      }, 4000);
-      setTimeout(() => {
-        controller.enqueue(new TextEncoder().encode("  (Coldplay - Fix You)\n"));
-        controller.close();
-      }, 5000);
-    },
-  });
+    responseStream = awslambda.HttpResponseStream.from(
+      responseStream,
+      httpResponseMetadata
+    );
+    await new Promise((r) => setTimeout(r, 10));
+    responseStream.write("<html>");
+    responseStream.write("<p>First write!</p>");
 
-  return {
-    statusCode: 200,
-    body,
-    headers: {
-      "content-type": "text/lyrics",
-    },
-  };
-});
+    responseStream.write("<h1>Streaming h1</h1>");
+    await new Promise((r) => setTimeout(r, 1000));
+    responseStream.write("<h2>Streaming h2</h2>");
+    await new Promise((r) => setTimeout(r, 1000));
+    responseStream.write("<h3>Streaming h3</h3>");
+
+    responseStream.write("<p>DONE!</p>");
+    responseStream.end();
+  }
+);
